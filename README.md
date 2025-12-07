@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gestor de Tarefas Premium - Web II
 
-## Getting Started
+## Equipe
+- [Eliabi]
+- [Iury Morais]
+- [Galvão Segundo]
 
-First, run the development server:
+## Descrição
+O **Gestor de Tarefas Premium** é uma aplicação Fullstack desenvolvida para resolver o problema de desorganização pessoal e profissional. Permite aos usuários criar múltiplos "Workspaces" (espaços de trabalho) para categorizar suas atividades (ex: Trabalho, Estudos, Pessoal) e gerenciar tarefas em um quadro Kanban interativo. O foco principal é oferecer uma experiência de usuário (UX) fluida, moderna e visualmente agradável.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Tecnologias
+- **Next.js 14+ (App Router)**: Framework principal utilizando a arquitetura moderna de Server/Client Components.
+- **MongoDB Atlas & Mongoose**: Banco de dados NoSQL na nuvem para persistência de dados flexível.
+- **HeroUI (NextUI) & Tailwind CSS**: Biblioteca de componentes e utilitários CSS para uma interface responsiva e premium.
+- **NextAuth.js**: Sistema de autenticação seguro (Credenciais).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Funcionalidades
+- [x] **Cadastro e Login de Usuários**: Sistema completo de autenticação com proteção de rotas.
+- [x] **Múltiplos Workspaces**: Criação, visualização e exclusão de diferentes contextos (CRUD de Workspaces).
+- [x] **Gestão de Tarefas (CRUD)**: Adicionar, editar, listar e excluir tarefas dentro de cada workspace.
+- [x] **Visualização Kanban**: Organização visual das tarefas por status (Pendente, Em Andamento, Concluída).
+- [x] **Interface Responsiva**: Design adaptado para Celulares e Desktop.
+- [x] **Soft UI Design**: Estética minimalista com feedbacks visuais e micro-interações.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Configuração
+Instruções para rodar o projeto localmente:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Clone o repositório**
+   ```bash
+   git clone https://github.com/SEU_USUARIO/SEU_REPO.git
+   cd GestorDeTarefas
+   ```
 
-## Learn More
+2. **Configure as Variáveis de Ambiente**
+   Crie um arquivo `.env` na raiz e adicione:
+   ```env
+   MONGODB_URI=sua_string_de_conexao_mongodb_atlas
+   NEXTAUTH_SECRET=um_segredo_aleatorio_seguro
+   NEXTAUTH_URL=http://localhost:3000
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. **Instale as dependências**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **Rode o projeto**
+   ```bash
+   npm run dev
+   ```
+   Acesse http://localhost:3000
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy
+[Acesse o projeto aqui](https://link-da-vercel.com)

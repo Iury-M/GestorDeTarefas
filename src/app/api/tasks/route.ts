@@ -1,75 +1,52 @@
-import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
-import Task from '@/models/Task';
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route";
+import connectDB from "@/lib/db";
+import Task from "@/models/Task";
 
-// Força a rota a ser dinâmica para evitar cache estático
-export const dynamic = 'force-dynamic';
+export async function GET(req: Request) {
+  const session = await getServerSession(authOptions);
 
-// GET: Buscar todas as tarefas
-export async function GET() {
+  if (!session || !session.user) {
+    return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const workspace = searchParams.get('workspace') || "Meu Kanban";
+
+  await connectDB();
   try {
-    await connectDB();
-    const tasks = await Task.find({});
+    const tasks = await Task.find({
+      userId: session.user.id,
+      workspace: workspace
+    }).sort({ createdAt: -1 });
     return NextResponse.json(tasks);
   } catch (error) {
-    return NextResponse.json({ error: 'Erro ao buscar' }, { status: 500 });
+    return NextResponse.json({ message: "Erro ao buscar tarefas" }, { status: 500 });
   }
 }
 
-// POST: Criar tarefa
-export async function POST(request: Request) {
-  try {
-    await connectDB();
-    const data = await request.json();
-    const task = await Task.create(data);
-    return NextResponse.json(task, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Erro ao criar' }, { status: 500 });
+export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
   }
-}
 
-// PUT: Atualizar tarefa (ID vem dentro do JSON)
-export async function PUT(request: Request) {
   try {
+    const { title, description, status, workspace } = await req.json();
     await connectDB();
-    const data = await request.json();
-    const { _id, ...updateData } = data;
 
-    if (!_id) {
-      return NextResponse.json({ error: 'ID necessário' }, { status: 400 });
-    }
+    const newTask = await Task.create({
+      title,
+      description,
+      status,
+      workspace: workspace || "Meu Kanban",
+      userId: session.user.id,
+    });
 
-    const task = await Task.findByIdAndUpdate(_id, updateData, { new: true });
-    
-    if (!task) {
-        return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 });
-    }
-    
-    return NextResponse.json(task);
+    return NextResponse.json(newTask, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Erro ao atualizar' }, { status: 500 });
-  }
-}
-
-// DELETE: Apagar tarefa (ID vem na URL como ?id=...)
-export async function DELETE(request: Request) {
-  try {
-    await connectDB();
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-
-    if (!id) {
-      return NextResponse.json({ error: 'ID necessário' }, { status: 400 });
-    }
-
-    const task = await Task.findByIdAndDelete(id);
-
-    if (!task) {
-        return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 });
-    }
-
-    return NextResponse.json({ message: 'Deletado com sucesso' });
-  } catch (error) {
-    return NextResponse.json({ error: 'Erro ao deletar' }, { status: 500 });
+    return NextResponse.json({ message: "Erro ao criar tarefa" }, { status: 500 });
   }
 }

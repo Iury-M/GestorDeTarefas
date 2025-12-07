@@ -15,6 +15,15 @@ const TaskSchema = new Schema({
     enum: ['pendente', 'em_andamento', 'concluida'],
     default: 'pendente',
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  workspace: {
+    type: String,
+    default: "Meu Kanban",
+  },
 }, {
   timestamps: true,
 });
