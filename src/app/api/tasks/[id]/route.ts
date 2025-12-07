@@ -2,24 +2,20 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Task from '@/models/Task';
 
-// Helper para pegar o ID da URL
-async function getTaskId(params: Promise<{ id: string }>) {
-  const { id } = await params;
-  return id;
-}
+// Forçamos a rota a ser dinâmica
+export const dynamic = 'force-dynamic';
 
-// PUT: Atualizar uma tarefa
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  props: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await props.params;
     await connectDB();
-    const id = await getTaskId(params);
     const data = await request.json();
 
-    const task = await Task.findByIdAndUpdate(id, data, {
-      new: true, // Retorna o objeto atualizado
+    const task = await Task.findByIdAndUpdate(params.id, data, {
+      new: true,
       runValidators: true,
     });
 
@@ -29,27 +25,26 @@ export async function PUT(
 
     return NextResponse.json(task);
   } catch (error) {
-    return NextResponse.json({ error: 'Erro ao atualizar tarefa' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao atualizar' }, { status: 500 });
   }
 }
 
-// DELETE: Apagar uma tarefa
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  props: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await props.params;
     await connectDB();
-    const id = await getTaskId(params);
 
-    const task = await Task.findByIdAndDelete(id);
+    const task = await Task.findByIdAndDelete(params.id);
 
     if (!task) {
       return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'Tarefa deletada com sucesso' });
+    return NextResponse.json({ message: 'Deletado com sucesso' });
   } catch (error) {
-    return NextResponse.json({ error: 'Erro ao deletar tarefa' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao deletar' }, { status: 500 });
   }
 }
