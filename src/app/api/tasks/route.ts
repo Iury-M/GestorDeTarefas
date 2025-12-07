@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Task from '@/models/Task';
 
+// Força a rota a ser dinâmica para evitar cache estático
 export const dynamic = 'force-dynamic';
 
-// GET: Buscar tarefas
+// GET: Buscar todas as tarefas
 export async function GET() {
   try {
     await connectDB();
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
   }
 }
 
-// PUT: Atualizar tarefa (ID no JSON)
+// PUT: Atualizar tarefa (ID vem dentro do JSON)
 export async function PUT(request: Request) {
   try {
     await connectDB();
@@ -39,13 +40,18 @@ export async function PUT(request: Request) {
     }
 
     const task = await Task.findByIdAndUpdate(_id, updateData, { new: true });
+    
+    if (!task) {
+        return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 });
+    }
+    
     return NextResponse.json(task);
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao atualizar' }, { status: 500 });
   }
 }
 
-// DELETE: Apagar tarefa (ID na URL ?id=...)
+// DELETE: Apagar tarefa (ID vem na URL como ?id=...)
 export async function DELETE(request: Request) {
   try {
     await connectDB();
@@ -56,7 +62,12 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'ID necessário' }, { status: 400 });
     }
 
-    await Task.findByIdAndDelete(id);
+    const task = await Task.findByIdAndDelete(id);
+
+    if (!task) {
+        return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 });
+    }
+
     return NextResponse.json({ message: 'Deletado com sucesso' });
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao deletar' }, { status: 500 });
