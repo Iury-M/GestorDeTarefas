@@ -2,21 +2,20 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Task from '@/models/Task';
 
-// Forçar comportamento dinâmico para garantir que não faça cache estático
 export const dynamic = 'force-dynamic';
 
-// Rota GET: Busca todas as tarefas
+// GET: Buscar tarefas
 export async function GET() {
   try {
     await connectDB();
     const tasks = await Task.find({});
     return NextResponse.json(tasks);
   } catch (error) {
-    return NextResponse.json({ error: 'Erro ao buscar tarefas' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao buscar' }, { status: 500 });
   }
 }
 
-// Rota POST: Cria uma nova tarefa
+// POST: Criar tarefa
 export async function POST(request: Request) {
   try {
     await connectDB();
@@ -24,11 +23,11 @@ export async function POST(request: Request) {
     const task = await Task.create(data);
     return NextResponse.json(task, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Erro ao criar tarefa' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao criar' }, { status: 500 });
   }
 }
 
-// Rota PUT: Atualiza tarefa
+// PUT: Atualizar tarefa (ID no JSON)
 export async function PUT(request: Request) {
   try {
     await connectDB();
@@ -46,7 +45,7 @@ export async function PUT(request: Request) {
   }
 }
 
-// Rota DELETE: Apaga tarefa
+// DELETE: Apagar tarefa (ID na URL ?id=...)
 export async function DELETE(request: Request) {
   try {
     await connectDB();
