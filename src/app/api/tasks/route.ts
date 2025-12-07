@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Task from '@/models/Task';
 
+// Forçar comportamento dinâmico para garantir que não faça cache estático
+export const dynamic = 'force-dynamic';
+
 // Rota GET: Busca todas as tarefas
 export async function GET() {
   try {
@@ -25,37 +28,28 @@ export async function POST(request: Request) {
   }
 }
 
-// Rota PUT: Atualiza tarefa (ID vem no JSON)
+// Rota PUT: Atualiza tarefa
 export async function PUT(request: Request) {
   try {
     await connectDB();
     const data = await request.json();
-    const { _id, ...updateData } = data; // Separa o ID do resto dos dados
+    const { _id, ...updateData } = data;
 
     if (!_id) {
-      return NextResponse.json({ error: 'ID da tarefa não fornecido' }, { status: 400 });
+      return NextResponse.json({ error: 'ID necessário' }, { status: 400 });
     }
 
-    const task = await Task.findByIdAndUpdate(_id, updateData, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!task) {
-      return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 });
-    }
-
+    const task = await Task.findByIdAndUpdate(_id, updateData, { new: true });
     return NextResponse.json(task);
   } catch (error) {
-    return NextResponse.json({ error: 'Erro ao atualizar tarefa' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao atualizar' }, { status: 500 });
   }
 }
 
-// Rota DELETE: Apaga tarefa (ID vem no JSON ou na Query, vamos usar Query pra facilitar)
+// Rota DELETE: Apaga tarefa
 export async function DELETE(request: Request) {
   try {
     await connectDB();
-    // Pega o ID da URL assim: /api/tasks?id=123
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
@@ -63,14 +57,9 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'ID necessário' }, { status: 400 });
     }
 
-    const task = await Task.findByIdAndDelete(id);
-
-    if (!task) {
-      return NextResponse.json({ error: 'Tarefa não encontrada' }, { status: 404 });
-    }
-
-    return NextResponse.json({ message: 'Tarefa deletada com sucesso' });
+    await Task.findByIdAndDelete(id);
+    return NextResponse.json({ message: 'Deletado com sucesso' });
   } catch (error) {
-    return NextResponse.json({ error: 'Erro ao deletar tarefa' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao deletar' }, { status: 500 });
   }
 }
